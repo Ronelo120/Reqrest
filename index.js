@@ -1,7 +1,7 @@
 let info = {
     avatar: undefined,
-    firstname: undefined,
-    lastname: undefined,
+    first_name: undefined,
+    last_name: undefined,
     email: undefined,
 };
 
@@ -16,14 +16,14 @@ let url = 'https://reqres.in/api/users';
 
 function display(users) {
     let list = document.getElementById("user-list");
-    list.innerHTML = ''; // Clear the list before adding new data
+    list.innerHTML = '';
 
     users.forEach(user => {
         let textContent = `
         <div style="margin: 10px 0; display: flex; align-items: center;">
-            <img src="${user.avatar}" alt="${user.firstname} ${user.lastname}" />
+            <img src="${user.avatar}" alt="${user.first_name} ${user.last_name}" />
             <div>
-                <strong>${user.firstname} ${user.lastname}</strong> - ${user.email}
+                <strong>${user.first_name} ${user.last_name}</strong> - ${user.email}
             </div>
         </div>
         `;
@@ -35,8 +35,8 @@ async function buttonClick(button) {
     let response, data, id;
     let fileInput = document.getElementById("img");
 
-    info.firstname = document.getElementById("fname").value || undefined;
-    info.lastname = document.getElementById("lname").value || undefined;
+    info.first_name = document.getElementById("fname").value || undefined;
+    info.last_name = document.getElementById("lname").value || undefined;
     info.email = document.getElementById("cred").value || undefined;
 
     // Handle file input (avatar)
@@ -44,10 +44,10 @@ async function buttonClick(button) {
         const file = fileInput.files[0];
         const reader = new FileReader();
         reader.onloadend = async function () {
-            info.avatar = reader.result; // Base64 string of the image
+            info.avatar = reader.result; 
             await handleRequest(button);
         };
-        reader.readAsDataURL(file); // Convert file to base64
+        reader.readAsDataURL(file); 
     } else {
         info.avatar = undefined;
         await handleRequest(button);
@@ -61,11 +61,11 @@ async function handleRequest(button) {
         case "GET":
             response = await fetch(url);
             data = await response.json();
-            display(data.data); // Assuming the API returns a 'data' property with users
+            display(data.data); 
             break;
 
         case "POST":
-            if (!info.firstname || !info.lastname || !info.email) {
+            if (!info.first_name || !info.last_name || !info.email) {
                 alert("Please fill in all fields before submitting.");
                 return;
             }
@@ -87,7 +87,7 @@ async function handleRequest(button) {
                 return;
             }
 
-            if (!info.firstname || !info.lastname || !info.email) {
+            if (!info.first_name || !info.last_name || !info.email) {
                 alert("Please fill in all fields before updating.");
                 return;
             }
@@ -109,7 +109,7 @@ async function handleRequest(button) {
                 return;
             }
 
-            if (!info.firstname || !info.lastname || !info.email) {
+            if (!info.first_name || !info.last_name || !info.email) {
                 alert("Please fill in all fields before updating.");
                 return;
             }
