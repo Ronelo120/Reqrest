@@ -16,10 +16,16 @@ let url = 'https://reqres.in/api/users';
 
 function display(users) {
     let list = document.getElementById("user-list");
+    list.innerHTML = ''; // Clear the list before adding new data
+
     users.forEach(user => {
         let textContent = `
-        <img src=${user.avatar} />
-        ${user.firstname} ${user.lastname} - ${user.email}
+        <div style="margin: 10px 0; display: flex; align-items: center;">
+            <img src="${user.avatar}" alt="${user.firstname} ${user.lastname}" />
+            <div>
+                <strong>${user.firstname} ${user.lastname}</strong> - ${user.email}
+            </div>
+        </div>
         `;
         list.innerHTML += textContent;
     });
@@ -39,7 +45,6 @@ async function buttonClick(button) {
         const reader = new FileReader();
         reader.onloadend = async function () {
             info.avatar = reader.result; // Base64 string of the image
-
             await handleRequest(button);
         };
         reader.readAsDataURL(file); // Convert file to base64
@@ -57,7 +62,6 @@ async function handleRequest(button) {
             response = await fetch(url);
             data = await response.json();
             display(data.data); // Assuming the API returns a 'data' property with users
-            console.log(data);
             break;
 
         case "POST":
