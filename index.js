@@ -1,150 +1,119 @@
-let info = {
-    avatar: undefined,
-    first_name: undefined,
-    last_name: undefined,
-    email: undefined,
-};
+const API_URL = "https://reqres.in/api/users"; 
 
-let query = {
-    method: undefined,
-    headers: {
-        "Content-Type": "application/json"
-    }
-};
+function handleButtonClick(event) {
+    const action = event.target.getAttribute("data-action");
+    const id = document.getElementById("id").value;
+    const firstName = document.getElementById("fname").value;
+    const lastName = document.getElementById("lname").value;
+    const email = document.getElementById("cred").value;
 
-let url = 'https://reqres.in/api/users';
+    if (action === "GET") getUsers();
+    else if (action === "POST") createUser(firstName, lastName, email);
+    else if (action === "PUT") updateUser(id, firstName, lastName, email);
+    else if (action === "PATCH") patchUser(id, firstName, lastName, email);
+    else if (action === "DELETE") deleteUser(id);
+}
 
-function display(users) {
-    let list = document.getElementById("user-list");
-    list.innerHTML = '';
+function getUsers() {
+    fetch(API_URL)
+        .then(res => res.json())
+        .then(data => displayUsers(data.data))
+        .catch(err => console.error("Error fetching users:", err));
+}
+
+function displayUsers(users) {
+    const container = document.getElementById("user-list");
+    container.innerHTML = ""; 
+    container.classList.add("horizontal-scroll");
 
     users.forEach(user => {
-        let textContent = `
-        <div style="margin: 10px 0; display: flex; align-items: center;">
-            <img src="${user.avatar}" alt="${user.first_name} ${user.last_name}" />
-            <div>
-                <strong>${user.first_name} ${user.last_name}</strong> - ${user.email}
-            </div>
-        </div>
+        const userDiv = document.createElement("div");
+        userDiv.classList.add("user-card");
+        userDiv.setAttribute("data-id", user.id);
+        userDiv.innerHTML = `
+            <p><strong>ID:</strong> ${user.id}</p>
+            <p><strong>First Name:</strong> <span class="first-name">${user.first_name}</span></p>
+            <p><strong>Last Name:</strong> <span class="last-name">${user.last_name}</span></p>
+            <p><strong>Email:</strong> <span class="email">${user.email}</span></p>
+            <img src="${user.avatar}" alt="User Avatar">
         `;
-        list.innerHTML += textContent;
+        container.appendChild(userDiv);
     });
+    startScrolling();
 }
 
-async function buttonClick(button) {
-    let response, data, id;
-    let fileInput = document.getElementById("img");
+function startScrolling() {
+    const container = document.getElementById("user-list");
+    let scrollAmount = 0;
 
-    info.first_name = document.getElementById("fname").value || undefined;
-    info.last_name = document.getElementById("lname").value || undefined;
-    info.email = document.getElementById("cred").value || undefined;
-
-    // Handle file input (avatar)
-    if (fileInput && fileInput.files.length > 0) {
-        const file = fileInput.files[0];
-        const reader = new FileReader();
-        reader.onloadend = async function () {
-            info.avatar = reader.result; 
-            await handleRequest(button);
-        };
-        reader.readAsDataURL(file); 
-    } else {
-        info.avatar = undefined;
-        await handleRequest(button);
+    function scrollUsers() {
+        if (scrollAmount >= container.scrollWidth) {
+            scrollAmount = 0; 
+        }
+        container.scrollTo({ left: scrollAmount, behavior: "smooth" });
+        scrollAmount += 2; 
     }
+
+    setInterval(scrollUsers, 50); 
 }
 
-async function handleRequest(button) {
-    let response, data, id;
 
-    switch (button.innerText) {
-        case "GET":
-            response = await fetch(url);
-            data = await response.json();
-            display(data.data); 
-            break;
+function createUser(firstName, lastName, email) {
+    fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ first_name: firstName, last_name: lastName, email: email })
+    })
+    .then(res => res.json())
+    .then(data => {
+        alert(`User Created: ${JSON.stringify(data)}`);
+        if (data.id) {
+            addUserToUI(data);
+        }
+    })
+    .catch(err => console.error("Error creating user:", err));
+}
 
-        case "POST":
-            if (!info.first_name || !info.last_name || !info.email) {
-                alert("Please fill in all fields before submitting.");
-                return;
-            }
-            query.method = "POST";
-            query.body = JSON.stringify(info);
-            try {
-                response = await fetch(url, query);
-                data = await response.json();
-                console.log(data);
-            } catch (error) {
-                console.error("Error in POST request:", error);
-            }
-            break;
+function addUserToUI(user) {
+    const container = document.getElementById("user-list");
 
-        case "PUT":
-            id = document.getElementById("id").value;
-            if (!id) {
-                alert("ID is required for PUT");
-                return;
-            }
+    const userDiv = document.createElement("div");
+    userDiv.classList.add("user-card");
+    userDiv.setAttribute("data-id", user.id);
+    userDiv.innerHTML = `
+        <p><strong>ID:</strong> ${user.id}</p>
+        <p><strong>First Name:</strong> <span class="first-name">${user.first_name}</span></p>
+        <p><strong>Last Name:</strong> <span class="last-name">${user.last_name}</span></p>
+        <p><strong>Email:</strong> <span class="email">${user.email}</span></p>
+        <img src="${user.avatar}" alt="User Avatar">
+    `;
 
-            if (!info.first_name || !info.last_name || !info.email) {
-                alert("Please fill in all fields before updating.");
-                return;
-            }
-            query.method = "PUT";
-            query.body = JSON.stringify(info);
-            try {
-                response = await fetch(`${url}/${id}`, query);
-                data = await response.json();
-                console.log(data);
-            } catch (error) {
-                console.error("Error in PUT request:", error);
-            }
-            break;
+    container.appendChild(userDiv);
+}
 
-        case "PATCH":
-            id = document.getElementById("id").value;
-            if (!id) {
-                alert("ID is required for PATCH");
-                return;
-            }
+function patchUser(id, firstName, lastName, email) {
+    fetch(`${API_URL}/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ first_name: firstName, last_name: lastName, email: email })
+    })
+    .then(res => res.json())
+    .then(data => updateUserInUI(id, data))
+    .catch(err => console.error("Error patching user:", err));
+}
 
-            if (!info.first_name || !info.last_name || !info.email) {
-                alert("Please fill in all fields before updating.");
-                return;
-            }
-            query.method = "PATCH";
-            query.body = JSON.stringify(info);
-            try {
-                response = await fetch(`${url}/${id}`, query);
-                data = await response.json();
-                console.log(data);
-            } catch (error) {
-                console.error("Error in PATCH request:", error);
-            }
-            break;
+function deleteUser(id) {
+    fetch(`${API_URL}/${id}`, { method: "DELETE" })
+        .then(() => document.querySelector(`[data-id="${id}"]`)?.remove())
+        .catch(err => console.error("Error deleting user:", err));
+}
 
-        case "DELETE":
-            id = document.getElementById("id").value;
-            if (!id) {
-                alert("ID is required for DELETE");
-                return;
-            }
-            query.method = "DELETE";
-            delete query.body;
-            try {
-                response = await fetch(`${url}/${id}`, query);
-                if (response.ok) {
-                    console.log("Deleted successfully");
-                } else {
-                    console.error("Failed to delete");
-                }
-            } catch (error) {
-                console.error("Error in DELETE request:", error);
-            }
-            break;
-
-        default:
-            alert("Invalid action");
-    }
+function updateUserInUI(id, updatedData) {
+    document.querySelectorAll(".user-card").forEach(card => {
+        if (card.getAttribute("data-id") === id) {
+            card.querySelector(".first-name").textContent = updatedData.first_name || "N/A";
+            card.querySelector(".last-name").textContent = updatedData.last_name || "N/A";
+            card.querySelector(".email").textContent = updatedData.email || "N/A";
+        }
+    });
 }
