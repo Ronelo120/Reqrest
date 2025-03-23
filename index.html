@@ -7,47 +7,52 @@
     <link rel="stylesheet" href="index.css">
 </head>
 <body>
-    <div>
-        <div class="header">
-            <h1>API Testing</h1>
+    <div class="container">
+        <div class="left-panel">
+            <header class="header">
+                <h1>API Testing</h1>
+            </header>
+
+            <section class="fields">
+                <div class="field-group">
+                    <label for="id">ID</label>
+                    <input type="text" id="id" placeholder="Enter ID">
+                </div>
+
+                <div class="field-group">
+                    <label for="fname">First Name</label>
+                    <input type="text" id="fname" placeholder="Enter First Name">
+                </div>
+
+                <div class="field-group">
+                    <label for="lname">Last Name</label>
+                    <input type="text" id="lname" placeholder="Enter Last Name">
+                </div>
+
+                <div class="field-group">
+                    <label for="cred">Email</label>
+                    <input type="email" id="cred" placeholder="Enter Email">
+                </div>
+
+                <div class="field-group">
+                    <label for="img">Avatar (Image)</label>
+                    <input type="file" id="img" accept="image/*">
+                </div>
+            </section>
+
+            <section class="buttons">
+                <button data-action="GET" onclick="handleButtonClick(event)">GET</button>
+                <button data-action="POST" onclick="handleButtonClick(event)">POST</button>
+                <button data-action="PUT" onclick="handleButtonClick(event)">PUT</button>
+                <button data-action="PATCH" onclick="handleButtonClick(event)">PATCH</button>
+                <button data-action="DELETE" onclick="handleButtonClick(event)">DELETE</button>
+            </section>
         </div>
 
-        <div class="fields">
-            <div class="text">
-                <label>ID</label>
-                <input type="text" id="id"><br>
-            </div>
-
-            <div class="text">
-                <label>First Name</label>
-                <input type="text" id="fname"><br>
-            </div>
-
-            <div class="text">
-                <label>Last Name</label>
-                <input type="text" id="lname"><br>
-            </div>
-
-            <div class="text">
-                <label>Email</label>
-                <input type="text" id="cred"><br>
-            </div>
-
-            <div>
-                <label>Avatar (Image)</label>
-                <input type="file" id="img"><br>
-            </div>
+        <div class="right-panel">
+            <section id="user-list">
+            </section>
         </div>
-
-        <div>
-            <button onclick="buttonClick(this)">GET</button>
-            <button onclick="buttonClick(this)">POST</button>
-            <button onclick="buttonClick(this)">PUT</button>
-            <button onclick="buttonClick(this)">PATCH</button>
-            <button onclick="buttonClick(this)">DELETE</button>
-        </div>
-
-        <div id="user-list"></div>
     </div>
 
     <script src="./index.js"></script>
