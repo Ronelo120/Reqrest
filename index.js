@@ -58,7 +58,7 @@ function createUser(firstName, lastName, email) {
         })
         .then(res => res.json())
         .then(data => {
-            alert(`User Created: ${JSON.stringify(data)}`);
+            // alert(`User Created: ${JSON.stringify(data)}`);
 
             data.avatar = imageBase64;
             addUserToUI(data);
