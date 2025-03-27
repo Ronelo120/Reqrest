@@ -96,7 +96,6 @@ function updateUser(id, firstName, lastName, email) {
     })
     .then(res => res.json())
     .then(data => {
-        alert(`User Updated: ${JSON.stringify(data)}`);
         updateUserInUI(id, data);
     })
     .catch(err => console.error("Error updating user:", err));
