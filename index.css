@@ -1,7 +1,7 @@
 /* General Styles */
 body {
     background-image: url("https://raw.githubusercontent.com/Ronelo120/Reqrest/main/buildings_Kleki.jpg");
-    background-cover: cover;
+    background-cover: 200% 200%;
     background-repeat: no-repeat;
     font-family: Arial, sans-serif;
     margin: 0;
