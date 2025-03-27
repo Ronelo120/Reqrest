@@ -1,4 +1,4 @@
-const API_URL = "https://reqres.in/api/users"; 
+const API_URL = "https://reqres.in/api/users";
 
 function handleButtonClick(event) {
     const action = event.target.getAttribute("data-action");
@@ -23,56 +23,48 @@ function getUsers() {
 
 function displayUsers(users) {
     const container = document.getElementById("user-list");
-    container.innerHTML = ""; 
+    container.innerHTML = "";
     container.classList.add("horizontal-scroll");
 
     users.forEach(user => {
-        const userDiv = document.createElement("div");
-        userDiv.classList.add("user-card");
-        userDiv.setAttribute("data-id", user.id);
-        userDiv.innerHTML = `
-            <p><strong>ID:</strong> ${user.id}</p>
-            <p><strong>First Name:</strong> <span class="first-name">${user.first_name}</span></p>
-            <p><strong>Last Name:</strong> <span class="last-name">${user.last_name}</span></p>
-            <p><strong>Email:</strong> <span class="email">${user.email}</span></p>
-            <img src="${user.avatar}" alt="User Avatar">
-        `;
-        container.appendChild(userDiv);
+        addUserToUI(user);
     });
-    startScrolling();
 }
-
-function startScrolling() {
-    const container = document.getElementById("user-list");
-    let scrollAmount = 0;
-
-    function scrollUsers() {
-        if (scrollAmount >= container.scrollWidth) {
-            scrollAmount = 0; 
-        }
-        container.scrollTo({ left: scrollAmount, behavior: "smooth" });
-        scrollAmount += 2; 
-    }
-
-    setInterval(scrollUsers, 50); 
-}
-
 
 function createUser(firstName, lastName, email) {
-    fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ first_name: firstName, last_name: lastName, email: email })
-    })
-    .then(res => res.json())
-    .then(data => {
-        alert(`User Created: ${JSON.stringify(data)}`);
-        if (data.id) {
-            data.avatar = "https://via.placeholder.com/150";
+    if (!firstName || !lastName || !email) {
+        alert("Please enter all required fields.");
+        return;
+    }
+
+    const fileInput = document.getElementById("avatar");
+    const file = fileInput.files[0];
+
+    if (!file) {
+        alert("Please upload an image.");
+        return;
+    }
+
+
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = function () {
+        const imageBase64 = reader.result;
+
+        fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ first_name: firstName, last_name: lastName, email: email })
+        })
+        .then(res => res.json())
+        .then(data => {
+            alert(`User Created: ${JSON.stringify(data)}`);
+
+            data.avatar = imageBase64;
             addUserToUI(data);
-        }
-    })
-    .catch(err => console.error("Error creating user:", err));
+        })
+        .catch(err => console.error("Error creating user:", err));
+    };
 }
 
 function addUserToUI(user) {
@@ -92,6 +84,27 @@ function addUserToUI(user) {
     container.appendChild(userDiv);
 }
 
+function updateUser(id, firstName, lastName, email) {
+    if (!id) {
+        alert("Please enter a valid user ID to update.");
+        return;
+    }
+
+    fetch(`${API_URL}/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ first_name: firstName, last_name: lastName, email: email })
+    })
+    .then(res => res.json())
+    .then(data => {
+        alert(`User Updated: ${JSON.stringify(data)}`);
+        updateUserInUI(id, data);
+    })
+    .catch(err => console.error("Error updating user:", err));
+}
+
+
+// PATCH
 function patchUser(id, firstName, lastName, email) {
     fetch(`${API_URL}/${id}`, {
         method: "PATCH",
@@ -103,6 +116,8 @@ function patchUser(id, firstName, lastName, email) {
     .catch(err => console.error("Error patching user:", err));
 }
 
+
+// DELETE
 function deleteUser(id) {
     fetch(`${API_URL}/${id}`, { method: "DELETE" })
         .then(() => document.querySelector(`[data-id="${id}"]`)?.remove())
